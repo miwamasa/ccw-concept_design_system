@@ -13,20 +13,6 @@ class CNDComponent(Component):
     situations: List[Any] = Field(default_factory=list)
     parent: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        # Define ports dynamically based on subsystems
-        for i, subsys in enumerate(self.subsystems):
-            self.add_input_port(Port(
-                name=f"subsystem_{i}",
-                data_type="Any",
-                direction=PortDirection.INPUT
-            ))
-        self.add_output_port(Port(
-            name="integrated_system",
-            data_type="Any",
-            direction=PortDirection.OUTPUT
-        ))
 
     def execute(self) -> Any:
         """Execute conditional integration."""
@@ -52,20 +38,6 @@ class BUPComponent(Component):
     backups: List[Any] = Field(default_factory=list)
     parent: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="primary", data_type="Any", direction=PortDirection.INPUT))
-        for i, backup in enumerate(self.backups):
-            self.add_input_port(Port(
-                name=f"backup_{i}",
-                data_type="Any",
-                direction=PortDirection.INPUT
-            ))
-        self.add_output_port(Port(
-            name="integrated_system",
-            data_type="Any",
-            direction=PortDirection.OUTPUT
-        ))
 
     def execute(self) -> Any:
         """Execute backup integration."""
@@ -90,19 +62,6 @@ class COLComponent(Component):
     subsystems: List[Any] = Field(default_factory=list)
     parent: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        for i, subsys in enumerate(self.subsystems):
-            self.add_input_port(Port(
-                name=f"subsystem_{i}",
-                data_type="Any",
-                direction=PortDirection.INPUT
-            ))
-        self.add_output_port(Port(
-            name="integrated_system",
-            data_type="Any",
-            direction=PortDirection.OUTPUT
-        ))
 
     def execute(self) -> Any:
         """Execute collaboration integration."""
@@ -126,19 +85,6 @@ class ALTComponent(Component):
     subsystems: List[Any] = Field(default_factory=list)
     parent: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        for i, subsys in enumerate(self.subsystems):
-            self.add_input_port(Port(
-                name=f"subsystem_{i}",
-                data_type="Any",
-                direction=PortDirection.INPUT
-            ))
-        self.add_output_port(Port(
-            name="integrated_system",
-            data_type="Any",
-            direction=PortDirection.OUTPUT
-        ))
 
     def execute(self) -> Any:
         """Execute alternative integration."""
@@ -162,19 +108,6 @@ class EXOComponent(Component):
     subsystems: List[Any] = Field(default_factory=list)
     parent: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        for i, subsys in enumerate(self.subsystems):
-            self.add_input_port(Port(
-                name=f"subsystem_{i}",
-                data_type="Any",
-                direction=PortDirection.INPUT
-            ))
-        self.add_output_port(Port(
-            name="integrated_system",
-            data_type="Any",
-            direction=PortDirection.OUTPUT
-        ))
 
     def execute(self) -> Any:
         """Execute exclusive integration."""

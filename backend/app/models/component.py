@@ -1,7 +1,6 @@
 """Component base classes and types for the Concept Design Support System."""
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Literal
+from typing import Any, Dict, List, Optional
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -44,7 +43,7 @@ class Port(BaseModel):
         self.connection = other_port_id
 
 
-class Component(BaseModel, ABC):
+class Component(BaseModel):
     """Base component class."""
 
     id: str
@@ -55,6 +54,7 @@ class Component(BaseModel, ABC):
 
     class Config:
         use_enum_values = True
+        arbitrary_types_allowed = True
 
     def add_input_port(self, port: Port) -> None:
         """Add an input port."""
@@ -64,15 +64,13 @@ class Component(BaseModel, ABC):
         """Add an output port."""
         self.output_ports[port.name] = port
 
-    @abstractmethod
     def execute(self) -> Any:
-        """Execute the component logic."""
-        pass
+        """Execute the component logic. Override in subclasses."""
+        return None
 
-    @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
         """Convert component to dictionary representation."""
-        pass
+        return self.model_dump(exclude_none=True)
 
     def __repr__(self) -> str:
         return f"{self.type}(id={self.id})"
