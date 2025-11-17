@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -106,33 +106,49 @@ export const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   graphData,
   title,
 }) => {
-  const initialNodes = useMemo(
-    () => graphData ? convertToReactFlowNodes(graphData.nodes) : [],
-    [graphData]
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const initialEdges = useMemo(
-    () => graphData ? convertToReactFlowEdges(graphData.edges) : [],
-    [graphData]
-  );
-
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  // Update nodes and edges when graphData changes
+  useEffect(() => {
+    if (graphData) {
+      const newNodes = convertToReactFlowNodes(graphData.nodes);
+      const newEdges = convertToReactFlowEdges(graphData.edges);
+      setNodes(newNodes);
+      setEdges(newEdges);
+    } else {
+      setNodes([]);
+      setEdges([]);
+    }
+  }, [graphData, setNodes, setEdges]);
 
   return (
     <div style={{ height: '500px', border: '1px solid #ccc', borderRadius: '8px' }}>
       <h3 style={{ margin: '10px', textAlign: 'center' }}>{title}</h3>
       <div style={{ height: 'calc(100% - 50px)' }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          fitView
-        >
-          <Controls />
-          <Background />
-        </ReactFlow>
+        {nodes.length > 0 ? (
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+          >
+            <Controls />
+            <Background />
+          </ReactFlow>
+        ) : (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            color: '#999',
+            fontSize: '14px'
+          }}>
+            No nodes to display yet. Start exploring to build the graph.
+          </div>
+        )}
       </div>
     </div>
   );
