@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Optional
 
 from .services.design_exploration import DesignExplorationEngine
 from .services.graph_conversion import GraphConversionEngine
+from .services.interactive_exploration import InteractiveExplorationEngine
+from .services.knowledge_base import KnowledgeBase
 
 app = FastAPI(
     title="Concept Design Support System",
@@ -24,8 +26,10 @@ app.add_middleware(
 )
 
 # Global engine instances
-design_engine = DesignExplorationEngine()
+knowledge_base = KnowledgeBase()
+design_engine = DesignExplorationEngine(knowledge_base)
 conversion_engine = GraphConversionEngine()
+interactive_engine = InteractiveExplorationEngine(knowledge_base)
 
 
 # Request/Response models
@@ -221,21 +225,200 @@ async def get_component_types():
     """
     return {
         "de_components": [
-            {"type": "SI", "name": "Situation Assessment"},
-            {"type": "PI", "name": "Problem Identification"},
-            {"type": "EI", "name": "Establish Intention"},
-            {"type": "DI", "name": "Decompose Intention"},
-            {"type": "CB", "name": "Conditional Branch"},
-            {"type": "SA", "name": "Solution Assignment"}
+            {"type": "SI", "name": "Situation Assessment", "description": "Assess the current situation"},
+            {"type": "PI", "name": "Problem Identification", "description": "Identify problems in the system"},
+            {"type": "EI", "name": "Establish Intention", "description": "Establish intention to solve the problem"},
+            {"type": "DI", "name": "Decompose Intention", "description": "Decompose intention into sub-intentions"},
+            {"type": "CB", "name": "Conditional Branch", "description": "Branch based on conditions"},
+            {"type": "SA", "name": "Solution Assignment", "description": "Assign solution to the system"}
         ],
         "si_components": [
-            {"type": "CND", "name": "Condition"},
-            {"type": "BUP", "name": "Backups"},
-            {"type": "COL", "name": "Collaboration"},
-            {"type": "ALT", "name": "Alternative"},
-            {"type": "EXO", "name": "Exclusive"}
+            {"type": "CND", "name": "Condition", "description": "Role division based on situations"},
+            {"type": "BUP", "name": "Backups", "description": "Backup relationship between subsystems"},
+            {"type": "COL", "name": "Collaboration", "description": "Subsystems work together"},
+            {"type": "ALT", "name": "Alternative", "description": "Multiple options available"},
+            {"type": "EXO", "name": "Exclusive", "description": "Exactly one option must be chosen"}
         ]
     }
+
+
+# Interactive Exploration Endpoints
+
+class StartExplorationRequest(BaseModel):
+    """Request to start interactive exploration."""
+    initial_system: str
+
+
+class StepRequest(BaseModel):
+    """Request for a step in exploration."""
+    pass
+
+
+class SituationRequest(BaseModel):
+    """Request to assess situation."""
+    situation: str
+
+
+class ProblemRequest(BaseModel):
+    """Request to identify problem."""
+    problem: str
+
+
+class IntentionRequest(BaseModel):
+    """Request to establish intention."""
+    intention: str
+
+
+class DecomposeRequest(BaseModel):
+    """Request to decompose intention."""
+    sub_intentions: List[str]
+    sub_systems: List[str]
+
+
+class SolutionRequest(BaseModel):
+    """Request to apply solution."""
+    solution: str
+
+
+@app.post("/api/interactive/start")
+async def start_interactive_exploration(request: StartExplorationRequest):
+    """Start interactive design exploration.
+
+    Args:
+        request: Initial system to explore
+
+    Returns:
+        Next step information
+    """
+    try:
+        interactive_engine.reset()
+        result = interactive_engine.start_exploration(request.initial_system)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/interactive/situation")
+async def assess_situation_step(request: SituationRequest):
+    """Execute situation assessment step.
+
+    Args:
+        request: Situation to assess
+
+    Returns:
+        Next step information
+    """
+    try:
+        result = interactive_engine.assess_situation(request.situation)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/interactive/problem")
+async def identify_problem_step(request: ProblemRequest):
+    """Execute problem identification step.
+
+    Args:
+        request: Problem to identify
+
+    Returns:
+        Next step information
+    """
+    try:
+        result = interactive_engine.identify_problem(request.problem)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/interactive/intention")
+async def establish_intention_step(request: IntentionRequest):
+    """Execute intention establishment step.
+
+    Args:
+        request: Intention to establish
+
+    Returns:
+        Next step information
+    """
+    try:
+        result = interactive_engine.establish_intention(request.intention)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/interactive/decompose")
+async def decompose_intention_step(request: DecomposeRequest):
+    """Execute intention decomposition step.
+
+    Args:
+        request: Sub-intentions and sub-systems
+
+    Returns:
+        Next step information
+    """
+    try:
+        result = interactive_engine.decompose_intention(
+            request.sub_intentions,
+            request.sub_systems
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/interactive/solution")
+async def apply_solution_step(request: SolutionRequest):
+    """Execute solution application step.
+
+    Args:
+        request: Solution to apply
+
+    Returns:
+        Next step information
+    """
+    try:
+        result = interactive_engine.apply_solution(request.solution)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/interactive/state")
+async def get_exploration_state():
+    """Get current exploration state.
+
+    Returns:
+        Current state information
+    """
+    try:
+        return interactive_engine.get_current_state()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/knowledge-base")
+async def get_knowledge_base():
+    """Get knowledge base contents.
+
+    Returns:
+        Knowledge base data
+    """
+    try:
+        return knowledge_base.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/knowledge-base/systems")
+async def get_all_systems():
+    """Get all known systems from knowledge base."""
+    try:
+        return {"systems": knowledge_base.get_all_systems()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

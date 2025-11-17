@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { GraphVisualization } from './components/GraphVisualization';
+import { InteractiveExploration } from './components/InteractiveExploration';
 import { exploreDesign, convertGraphs } from './services/api';
 import { GraphData } from './types';
 import './App.css';
 
+type Mode = 'interactive' | 'auto';
+
 function App() {
+  const [mode, setMode] = useState<Mode>('interactive');
   const [initialSystem, setInitialSystem] = useState('car_running');
   const [deGraph, setDeGraph] = useState<GraphData | null>(null);
   const [ldGraph, setLdGraph] = useState<GraphData | null>(null);
@@ -47,91 +51,129 @@ function App() {
       <header className="App-header">
         <h1>Concept Design Support System</h1>
         <p>Component-based Concept Design Visualization</p>
+
+        <div className="mode-selector">
+          <button
+            className={`mode-button ${mode === 'interactive' ? 'active' : ''}`}
+            onClick={() => setMode('interactive')}
+          >
+            Interactive Mode
+          </button>
+          <button
+            className={`mode-button ${mode === 'auto' ? 'active' : ''}`}
+            onClick={() => setMode('auto')}
+          >
+            Auto Mode
+          </button>
+        </div>
       </header>
 
-      <div className="container">
-        <div className="control-panel">
-          <h2>Design Exploration</h2>
+      {mode === 'interactive' ? (
+        <InteractiveExploration />
+      ) : (
+        <div className="container">
+          <div className="control-panel">
+            <h2>Automatic Design Exploration</h2>
 
-          <div className="input-group">
-            <label htmlFor="initial-system">Initial System:</label>
-            <input
-              id="initial-system"
-              type="text"
-              value={initialSystem}
-              onChange={(e) => setInitialSystem(e.target.value)}
-              placeholder="e.g., car_running"
-            />
-          </div>
-
-          <div className="button-group">
-            <button onClick={handleExplore} disabled={loading}>
-              {loading ? 'Exploring...' : 'Start Exploration'}
-            </button>
-            <button onClick={handleConvert} disabled={loading || !deGraph}>
-              {loading ? 'Converting...' : 'Convert to LD & SI'}
-            </button>
-          </div>
-
-          {error && (
-            <div className="error-message">
-              {error}
+            <div className="input-group">
+              <label htmlFor="initial-system">Initial System:</label>
+              <input
+                id="initial-system"
+                type="text"
+                value={initialSystem}
+                onChange={(e) => setInitialSystem(e.target.value)}
+                placeholder="e.g., car_running"
+              />
             </div>
-          )}
 
-          <div className="info-panel">
-            <h3>Instructions</h3>
-            <ol>
-              <li>Enter an initial system (e.g., "car_running")</li>
-              <li>Click "Start Exploration" to create a DE graph</li>
-              <li>Click "Convert to LD & SI" to see all graph transformations</li>
-            </ol>
+            <div className="button-group">
+              <button onClick={handleExplore} disabled={loading}>
+                {loading ? 'Exploring...' : 'Start Exploration'}
+              </button>
+              <button onClick={handleConvert} disabled={loading || !deGraph}>
+                {loading ? 'Converting...' : 'Convert to LD & SI'}
+              </button>
+            </div>
 
-            <h3>Graph Types</h3>
-            <ul>
-              <li><strong>DE Graph:</strong> Design Exploration - records design history</li>
-              <li><strong>LD Graph:</strong> Logical Dependency - logical relationships</li>
-              <li><strong>SI Graph:</strong> Systems Integration - final system hierarchy</li>
-            </ul>
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            <div className="info-panel">
+              <h3>Instructions</h3>
+              <ol>
+                <li>Enter an initial system (e.g., "car_running")</li>
+                <li>Click "Start Exploration" to create a DE graph</li>
+                <li>Click "Convert to LD & SI" to see all graph transformations</li>
+              </ol>
+
+              <h3>Graph Types</h3>
+              <ul>
+                <li><strong>DE Graph:</strong> Design Exploration - records design history</li>
+                <li><strong>LD Graph:</strong> Logical Dependency - logical relationships</li>
+                <li><strong>SI Graph:</strong> Systems Integration - final system hierarchy</li>
+              </ul>
+
+              <h3>DE Components</h3>
+              <ul>
+                <li><strong>SI:</strong> Situation Assessment</li>
+                <li><strong>PI:</strong> Problem Identification</li>
+                <li><strong>EI:</strong> Establish Intention</li>
+                <li><strong>DI:</strong> Decompose Intention</li>
+                <li><strong>CB:</strong> Conditional Branch</li>
+                <li><strong>SA:</strong> Solution Assignment</li>
+              </ul>
+
+              <h3>SI Components</h3>
+              <ul>
+                <li><strong>CND:</strong> Condition</li>
+                <li><strong>BUP:</strong> Backups</li>
+                <li><strong>COL:</strong> Collaboration</li>
+                <li><strong>ALT:</strong> Alternative</li>
+                <li><strong>EXO:</strong> Exclusive</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="graphs-panel">
+            {deGraph && (
+              <div className="graph-container">
+                <GraphVisualization
+                  graphData={deGraph}
+                  title="DE Graph (Design Exploration)"
+                />
+              </div>
+            )}
+
+            {ldGraph && (
+              <div className="graph-container">
+                <GraphVisualization
+                  graphData={ldGraph}
+                  title="LD Graph (Logical Dependency)"
+                />
+              </div>
+            )}
+
+            {siGraph && (
+              <div className="graph-container">
+                <GraphVisualization
+                  graphData={siGraph}
+                  title="SI Graph (Systems Integration)"
+                />
+              </div>
+            )}
+
+            {!deGraph && !ldGraph && !siGraph && (
+              <div className="empty-state">
+                <h3>No graphs to display</h3>
+                <p>Start a design exploration to visualize the concept design process</p>
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="graphs-panel">
-          {deGraph && (
-            <div className="graph-container">
-              <GraphVisualization
-                graphData={deGraph}
-                title="DE Graph (Design Exploration)"
-              />
-            </div>
-          )}
-
-          {ldGraph && (
-            <div className="graph-container">
-              <GraphVisualization
-                graphData={ldGraph}
-                title="LD Graph (Logical Dependency)"
-              />
-            </div>
-          )}
-
-          {siGraph && (
-            <div className="graph-container">
-              <GraphVisualization
-                graphData={siGraph}
-                title="SI Graph (Systems Integration)"
-              />
-            </div>
-          )}
-
-          {!deGraph && !ldGraph && !siGraph && (
-            <div className="empty-state">
-              <h3>No graphs to display</h3>
-              <p>Start a design exploration to visualize the concept design process</p>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

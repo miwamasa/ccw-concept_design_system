@@ -35,6 +35,36 @@ body {
   opacity: 0.9;
 }
 
+.mode-selector {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.mode-button {
+  padding: 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mode-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.mode-button.active {
+  background: white;
+  color: #667eea;
+  border-color: white;
+}
+
 .container {
   display: grid;
   grid-template-columns: 350px 1fr;
