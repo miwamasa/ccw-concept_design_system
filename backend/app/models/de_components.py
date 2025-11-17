@@ -12,12 +12,6 @@ class SIComponent(Component):
     system: Any
     situation: Optional[Any] = None
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        # Define ports
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="evaluated_system", data_type="tuple", direction=PortDirection.OUTPUT))
-
     def execute(self) -> tuple:
         """Execute situation assessment."""
         return (self.system, self.situation)
@@ -39,11 +33,6 @@ class PIComponent(Component):
     type: ComponentType = ComponentType.PI
     system: Any
     problem: Optional[Any] = None
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="problem", data_type="Any", direction=PortDirection.OUTPUT))
 
     def execute(self) -> Any:
         """Execute problem identification."""
@@ -67,12 +56,6 @@ class EIComponent(Component):
     system: Any
     problem: Any
     intention: Optional[Any] = None
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_input_port(Port(name="problem", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="intention", data_type="Any", direction=PortDirection.OUTPUT))
 
     def execute(self) -> Any:
         """Execute intention establishment."""
@@ -99,13 +82,6 @@ class DIComponent(Component):
     sub_intentions: List[Any] = Field(default_factory=list)
     sub_systems: List[Any] = Field(default_factory=list)
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_input_port(Port(name="intention", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="sub_intentions", data_type="List", direction=PortDirection.OUTPUT))
-        self.add_output_port(Port(name="sub_systems", data_type="List", direction=PortDirection.OUTPUT))
-
     def execute(self) -> tuple:
         """Execute intention decomposition."""
         return (self.sub_intentions, self.sub_systems)
@@ -131,13 +107,6 @@ class CBComponent(Component):
     intention: Any
     situation: Any
 
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_input_port(Port(name="intention", data_type="Any", direction=PortDirection.INPUT))
-        self.add_input_port(Port(name="situation", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="focused_intention", data_type="tuple", direction=PortDirection.OUTPUT))
-
     def execute(self) -> tuple:
         """Execute conditional branching."""
         return (self.intention, self.situation)
@@ -161,12 +130,6 @@ class SAComponent(Component):
     system: Any
     solution: Any
     subsystem: Optional[Any] = None
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.add_input_port(Port(name="system", data_type="Any", direction=PortDirection.INPUT))
-        self.add_input_port(Port(name="solution", data_type="Any", direction=PortDirection.INPUT))
-        self.add_output_port(Port(name="subsystem", data_type="Any", direction=PortDirection.OUTPUT))
 
     def execute(self) -> Any:
         """Execute solution assignment."""
