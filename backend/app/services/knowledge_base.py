@@ -114,20 +114,16 @@ class KnowledgeBase:
         key = (str(system), str(intention))
         return self._decompositions.get(key)
 
-    def query_solutions(self, intention: Any) -> List[str]:
-        """Query available solutions for a given intention.
+    def query_solutions(self, system: Any) -> List[str]:
+        """Query available solutions for a given system.
 
         Args:
-            intention: The intention to solve
+            system: The system to get solutions for
 
         Returns:
             List of solution strings
         """
-        # Search through solutions to find matches
-        for system, solutions in self._solutions.items():
-            if str(intention).lower() in system.lower():
-                return solutions
-        return []
+        return self._solutions.get(str(system), [])
 
     def add_situation(self, system: str, situation: str):
         """Add a situation to the knowledge base."""
