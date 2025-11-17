@@ -1,0 +1,19 @@
+{
+  "name": "concept-design-system",
+  "version": "1.0.0",
+  "description": "Concept Design Support System based on component-based approach",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && pip install -r requirements.txt",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && pytest"
+  },
+  "keywords": ["concept-design", "systems-integration", "graph-visualization"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
