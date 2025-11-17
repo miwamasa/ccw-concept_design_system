@@ -8,10 +8,13 @@
 
 ### 主な機能
 
-- **設計探索 (DE: Design Exploration)**: 設計プロセスを6種類のコンポーネントで記録
+- **インタラクティブ設計探索**: ステップバイステップでDE/SIコンポーネントを使用しながら設計探索を体験
+- **知識ベースシステム**: 車の衝突回避システムの例を含む、ドメイン知識の活用
+- **設計探索 (DE: Design Exploration)**: 設計プロセスを6種類のコンポーネント(SI, PI, EI, DI, CB, SA)で記録
 - **論理依存グラフ (LD: Logical Dependency)**: システム間の論理的な依存関係を表現
-- **システム統合グラフ (SI: Systems Integration)**: 最終的なシステム階層構造を可視化
+- **システム統合グラフ (SI: Systems Integration)**: 最終的なシステム階層構造を5種類のコンポーネント(CND, BUP, COL, ALT, EXO)で可視化
 - **自動変換**: DE → LD → SI への自動グラフ変換
+- **リアルタイムグラフ可視化**: ReactFlowによる美しいインタラクティブなグラフ表示
 
 ## システムアーキテクチャ
 
@@ -79,11 +82,37 @@ npm run dev
 
 1. ブラウザで http://localhost:5173 を開く
 
-2. 初期システムを入力（例: "car_running"）
+2. モードを選択:
+   - **Interactive Mode**: ステップバイステップで設計探索を体験
+   - **Auto Mode**: 自動的に設計探索を実行
 
-3. "Start Exploration" をクリックしてDEグラフを生成
+### Interactive Mode（推奨）
 
-4. "Convert to LD & SI" をクリックして全てのグラフを表示
+インタラクティブモードでは、実際にDE/SIコンポーネントを使いながら設計探索を体験できます。
+
+1. "Start Exploration" をクリック（例: "car_running"）
+
+2. 各ステップで入力:
+   - **SI (Situation Assessment)**: 状況を評価
+   - **PI (Problem Identification)**: 問題を特定
+   - **EI (Establish Intention)**: 意図を確立
+   - **DI (Decompose Intention)** または **SA (Solution Assignment)**: 意図を分解 or 解決策を適用
+
+3. 知識ベースからの提案を参考にしながら進める
+
+4. DEグラフがリアルタイムで更新される
+
+5. サブシステムがある場合は、順次探索を続ける
+
+### Auto Mode
+
+自動モードでは、定義済みのシナリオで一括して設計探索を実行します。
+
+1. 初期システムを入力（例: "car_running"）
+
+2. "Start Exploration" をクリックしてDEグラフを生成
+
+3. "Convert to LD & SI" をクリックして全てのグラフを表示
 
 ## DEコンポーネント
 
@@ -108,14 +137,30 @@ npm run dev
 
 ## API エンドポイント
 
+### 基本エンドポイント
 - `GET /` - APIルート情報
 - `GET /health` - ヘルスチェック
+- `GET /api/component-types` - 利用可能なコンポーネント型の一覧
+
+### 自動探索エンドポイント
 - `POST /api/explore` - 設計探索の実行
 - `GET /api/graphs/de` - DEグラフの取得
 - `GET /api/graphs/ld` - LDグラフの取得
 - `GET /api/graphs/si` - SIグラフの取得
 - `POST /api/convert` - 全グラフの変換と取得
-- `GET /api/component-types` - 利用可能なコンポーネント型の一覧
+
+### インタラクティブ探索エンドポイント
+- `POST /api/interactive/start` - インタラクティブ探索の開始
+- `POST /api/interactive/situation` - 状況評価ステップ
+- `POST /api/interactive/problem` - 問題特定ステップ
+- `POST /api/interactive/intention` - 意図確立ステップ
+- `POST /api/interactive/decompose` - 意図分解ステップ
+- `POST /api/interactive/solution` - 解決策適用ステップ
+- `GET /api/interactive/state` - 現在の探索状態の取得
+
+### 知識ベースエンドポイント
+- `GET /api/knowledge-base` - 知識ベース全体の取得
+- `GET /api/knowledge-base/systems` - 全システムの一覧
 
 ## プロジェクト構造
 
